@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:core';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_easyrefresh/easy_refresh.dart';
@@ -7,7 +6,10 @@ import 'package:flutter_swiper/flutter_swiper.dart';
 import 'package:wanandroid_flutter/common/api.dart';
 import 'package:wanandroid_flutter/entity/article_entity.dart';
 import 'package:wanandroid_flutter/entity/banner_entity.dart';
+import 'package:wanandroid_flutter/entity/common_entity.dart';
 import 'package:wanandroid_flutter/httpUtil.dart';
+import 'package:wanandroid_flutter/pages/loginPage.dart';
+import 'package:wanandroid_flutter/util/ToastUtil.dart';
 
 class HomePage extends StatefulWidget {
   HomePage({Key key}) : super(key: key);
@@ -43,7 +45,7 @@ class _HomePageState extends State<HomePage> {
 
       //article
       var articleResponse =
-      await HttpUtil().get(Api.ARTICLE_LIST + "$_page/json");
+          await HttpUtil().get(Api.ARTICLE_LIST + "$_page/json");
       Map articlemap = json.decode(articleResponse.toString());
       var articleEntity = ArticleEntity().fromJson(articlemap);
 
@@ -74,21 +76,17 @@ class _HomePageState extends State<HomePage> {
             getHttp();
           });
         },
-
         onLoad: () async {
           await Future.delayed(
               Duration(
                 seconds: 1,
-              ),
-                  () async {
-                setState(() {
-                  _page++;
-                });
-                getMoreData();
-              }
-          );
+              ), () async {
+            setState(() {
+              _page++;
+            });
+            getMoreData();
+          });
         },
-
         slivers: <Widget>[
           SliverList(
               delegate: SliverChildBuilderDelegate(
@@ -102,10 +100,8 @@ class _HomePageState extends State<HomePage> {
                   return null;
                 },
                 childCount: articleDates.length + 1,
-              )
-          ),
+              )),
         ],
-
       ),
     );
   }
@@ -129,5 +125,65 @@ class _HomePageState extends State<HomePage> {
 
   Widget getBanner() {}
 
-  Widget getRow(int index) {}
+  Widget getRow(int i) {
+    return GestureDetector(
+      child: Container(
+        padding: EdgeInsets.symmetric(vertical: 10, horizontal: 5),
+        child: ListTile(
+          leading: IconButton(
+            icon: articleDates[i].collect
+                ? Icon(
+              Icons.favorite,
+              color: Theme
+                  .of(context)
+                  .primaryColor,
+            )
+                : Icon(Icons.favorite_border),
+            tooltip: '收藏',
+            onPressed: () {
+              if (articleDates[i].collect) {
+                cancelConllect(articleDates[i].id);
+              } else {
+                addCollect(articleDates[i].id);
+              }
+            },
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future cancelConllect(int id) async {
+    var collectResponse =
+    await HttpUtil().post(Api.UN_COLLECT_ORIGIN_ID + "$id/json");
+    Map map = json.decode(collectResponse);
+    var entity = CommonEntity.fromJson(map);
+    if (entity.errorCode == -1001) {
+      YToast.show(context: context, msg: entity.errorMsg);
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => LoginPage()),
+      );
+    } else {
+      YToast.show(context: context, msg: "取消成功");
+      getHttp();
+    }
+  }
+
+  Future addCollect(int id) async {
+    var collectResponse = await HttpUtil().post(Api.COLLECT + '$id/json');
+    Map map = json.decode(collectResponse.toString());
+    var entity = CommonEntity.fromJson(map);
+    if (entity.errorCode == -1001) {
+      YToast.show(context: context, msg: entity.errorMsg);
+      Navigator.push(
+        context,
+
+      );
+    } else {
+      YToast.show(context: context, msg: "收藏成功");
+    }
+  }
 }
+
+
