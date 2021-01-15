@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provide/provide.dart';
+import 'package:share/share.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:wanandroid_flutter/pages/about.dart';
+import 'package:wanandroid_flutter/pages/articleDetail.dart';
+import 'package:wanandroid_flutter/pages/collectPage.dart';
 import 'package:wanandroid_flutter/pages/homePage.dart';
 import 'package:wanandroid_flutter/res/colors.dart';
 import 'package:wanandroid_flutter/res/strings.dart';
@@ -191,5 +195,84 @@ class _MyHomePageState extends State<MyHomePage> {
     _onItemTapped(3);
   }
 
-  Widget showDrawer() {}
+  Widget showDrawer() {
+    return Drawer(
+      child: ListView(
+        //ListView padding不为null的时候 drawer顶部的状态栏就不会有灰色的背景
+        padding: EdgeInsets.zero,
+        children: <Widget>[
+          UserAccountsDrawerHeader(
+              //头像
+              currentAccountPicture: GestureDetector(
+                child: ClipOval(
+                  child: Image.network(
+                      'https://avatars3.githubusercontent.com/u/10249862?s=400&u=23f947161b50cb0643fa11ebe2fd4bda1730889b&v=4.png'),
+                ),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => AboutPage()),
+                  );
+                },
+              ),
+              otherAccountsPictures: <Widget>[
+                IconButton(
+                    icon: Icon(
+                      Icons.stars,
+                      color: Colors.white,
+                    ),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => ArticleDetail(
+                                  title: "点个star",
+                                  url:
+                                      "https://github.com/pvphero/wanandroid_flutter_app",
+                                )),
+                      );
+                    })
+              ],
+              accountName: Text(
+                YString.proName,
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22),
+              ),
+              accountEmail: Text(YString.github)),
+          ListTile(
+            leading: Icon(Icons.favorite_border),
+            title: Text("我的收藏"),
+            trailing: Icon(Icons.chevron_right),
+            onTap: () {
+              Navigator.of(context).pop();
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => CollectPage()));
+            },
+          ),
+          ListTile(
+            leading: Icon(Icons.share),
+            title: Text("切换主题"),
+            trailing: Icon(Icons.chevron_right),
+            onTap: () {
+              Navigator.of(context).pop();
+              showThemeDialog();
+            },
+          ),
+          ListTile(
+            leading: Icon(Icons.info_outline),
+            title: Text("我要分享"),
+            trailing: Icon(Icons.chevron_right),
+            onTap: () {
+              Navigator.of(context).pop();
+              Share.share(
+                  '【玩安卓Flutter版】\nhttps://github.com/pvphero/wanandroid_flutter_app');
+            },
+          )
+        ],
+      ),
+    );
+  }
+
+  void showThemeDialog() {}
 }

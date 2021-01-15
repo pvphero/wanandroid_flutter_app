@@ -64,15 +64,15 @@ class _HomePageState extends State<HomePage> {
         header: PhoenixHeader(),
         footer: PhoenixFooter(),
         onRefresh: () async {
-          await Future.delayed(Duration(
-            seconds: 1,
-          ),
-                  () {
-                setState(() {
-                  _page = 0;
-                });
-                getHttp();
-              });
+          await Future.delayed(
+              Duration(
+                seconds: 1,
+              ), () {
+            setState(() {
+              _page = 0;
+            });
+            getHttp();
+          });
         },
 
         onLoad: () async {
@@ -88,6 +88,23 @@ class _HomePageState extends State<HomePage> {
               }
           );
         },
+
+        slivers: <Widget>[
+          SliverList(
+              delegate: SliverChildBuilderDelegate(
+                    (context, index) {
+                  if (index == 0) {
+                    return getBanner();
+                  }
+                  if (index < articleDates.length - 1) {
+                    return getRow(index);
+                  }
+                  return null;
+                },
+                childCount: articleDates.length + 1,
+              )
+          ),
+        ],
 
       ),
     );
@@ -109,4 +126,8 @@ class _HomePageState extends State<HomePage> {
     _swiperController.dispose();
     super.dispose();
   }
+
+  Widget getBanner() {}
+
+  Widget getRow(int index) {}
 }
