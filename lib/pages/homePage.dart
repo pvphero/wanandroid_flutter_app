@@ -93,13 +93,13 @@ class _HomePageState extends State<HomePage> {
           SliverList(
               delegate: SliverChildBuilderDelegate(
             (context, index) {
-              // if (index == 0) {
-              //   return getBanner();
-              // }
-              // if (index < articleDates.length - 1) {
-              //   return getRow(index);
-              // }
-              return getRow(index);
+              if (index == 0) {
+                return getBanner();
+              }
+              if (index < articleDates.length - 1) {
+                return getRow(index);
+              }
+              return null;
             },
             childCount: articleDates.length + 1,
           )),
@@ -125,7 +125,45 @@ class _HomePageState extends State<HomePage> {
     super.dispose();
   }
 
-  Widget getBanner() {}
+  Widget getBanner() {
+    return Container(
+      width: MediaQuery.of(context).size.width,
+      height: MediaQuery.of(context).size.width / 1.8 * 0.8,
+      child: Swiper(
+        itemCount: bannerData.length,
+        itemBuilder: (BuildContext context, int index) {
+          return Container(
+            decoration: BoxDecoration(
+                image: DecorationImage(
+              image: NetworkImage(bannerData[index].imagePath),
+              fit: BoxFit.fill,
+            )),
+          );
+        },
+        loop: false,
+        autoplay: false,
+        autoplayDelay: 30000,
+        //触发时 是否停止播放
+        autoplayDisableOnInteraction: true,
+        duration: 600,
+        //默认的分页按钮
+        controller: _swiperController,
+        //默认指示器
+        pagination: SwiperPagination(
+          //SwiperPagination。fraction 数字 1/5,默认点
+          builder: DotSwiperPaginationBuilder(size: 6, activeSize: 9),
+        ),
+        // 视图的宽度，即显示的item的宽度屏占比
+        viewportFraction: 0.8,
+        //两侧item的缩放比
+        scale: 0.9,
+
+        onTap: (int index) {
+          print("index-----$index");
+        },
+      ),
+    );
+  }
 
   Widget getRow(int i) {
     //返回一个手势识别的
